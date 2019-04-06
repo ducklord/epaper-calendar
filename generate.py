@@ -147,28 +147,15 @@ time = datetime.now()
 drawBlack.text((100, 75), time.strftime("%B"), font=font)
 
 """Draw the caleandar"""
-def draw_calendar(offset, size, font_size):
-    font_day_of_week = ImageFont.truetype(font_path, font_size)
-    font_month_day = ImageFont.truetype(font_path, font_size)
-    calendar_col = [
-        size[0] * 1 / 8 + offset[0],
-        size[0] * 2 / 8 + offset[0],
-        size[0] * 3 / 8 + offset[0],
-        size[0] * 4 / 8 + offset[0],
-        size[0] * 5 / 8 + offset[0],
-        size[0] * 6 / 8 + offset[0],
-        size[0] * 7 / 8 + offset[0]
-    ]
+def draw_calendar(offset, width, font_size_day_of_week, font_size_month_day):
+    font_day_of_week = ImageFont.truetype(font_path, font_size_day_of_week)
+    font_month_day = ImageFont.truetype(font_path, font_size_month_day)
+    def calendar_col(index):
+        return width * (index + 1) / 8 + offset[0]
 
-    row_day_of_week = font_size / 2 + offset[1]
-    calendar_row = [
-        font_size / 2 + font_size * 1 + offset[1],
-        font_size / 2 + font_size * 2 + offset[1],
-        font_size / 2 + font_size * 3 + offset[1],
-        font_size / 2 + font_size * 4 + offset[1],
-        font_size / 2 + font_size * 5 + offset[1],
-        font_size / 2 + font_size * 6 + offset[1]
-    ]
+    row_day_of_week = font_size_day_of_week / 2 + offset[1]
+    def calendar_row(index):
+        return font_size_day_of_week + font_size_month_day / 2 + font_size_month_day * index + offset[1]
 
     calendar.setfirstweekday(calendar.MONDAY)
     time = datetime.now()
@@ -176,20 +163,20 @@ def draw_calendar(offset, size, font_size):
     dayOfMonth = time.day
 
     for index, day in enumerate(['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn']):
-        pos = (calendar_col[index], row_day_of_week)
+        pos = (calendar_col(index), row_day_of_week)
         color = 'red' if index == dayOfWeek else 'black'
         draw_center_text(pos, day, font=font_day_of_week, color=color)
 
     monthCalendar = calendar.monthcalendar(time.year, time.month)
     for rowIndex in range(len(monthCalendar)):
         for monthDay in monthCalendar[rowIndex]:
-            pos = (calendar_col[monthCalendar[rowIndex].index(monthDay)],
-                   calendar_row[rowIndex])
+            pos = (calendar_col(monthCalendar[rowIndex].index(monthDay)),
+                   calendar_row(rowIndex))
             color = 'red' if monthDay == dayOfMonth else 'black'
             text = str(monthDay) if not monthDay == 0 else ''
             draw_center_text(pos, text, font=font_month_day, color=color)
 
-draw_calendar((0, 130), (EPD_WIDTH / 2, EPD_HEIGHT), 10)
+draw_calendar((0, 130), EPD_WIDTH / 2, 10, 20)
 
 #image.rotate(90, expand=True)
 imageBlack.save('output_black.bmp')
