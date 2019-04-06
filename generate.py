@@ -147,32 +147,34 @@ time = datetime.now()
 drawBlack.text((100, 75), time.strftime("%B"), font=font)
 
 """Draw the caleandar"""
-def draw_calendar(offset, width, font_size_day_of_week, font_size_month_day):
+def draw_calendar(offset, width, font_size_day_of_week, font_size_month_day, time = datetime.now()):
     font_day_of_week = ImageFont.truetype(font_path, font_size_day_of_week)
     font_month_day = ImageFont.truetype(font_path, font_size_month_day)
-    def calendar_col(index):
-        return width * (index + 1) / 8 + offset[0]
+    # TODO: translation?
+    days_in_week = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn']
+
+    day_of_week = time.weekday()
+    day_of_month = time.day
 
     row_day_of_week = font_size_day_of_week / 2 + offset[1]
     def calendar_row(index):
         return font_size_day_of_week + font_size_month_day / 2 + font_size_month_day * index + offset[1]
+    def calendar_col(index):
+        return width * (index + 1) / 8 + offset[0]
 
-    calendar.setfirstweekday(calendar.MONDAY)
-    time = datetime.now()
-    dayOfWeek = time.weekday()
-    dayOfMonth = time.day
-
-    for index, day in enumerate(['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn']):
+    for index, day in enumerate(days_in_week):
         pos = (calendar_col(index), row_day_of_week)
-        color = 'red' if index == dayOfWeek else 'black'
+        color = 'red' if index == day_of_week else 'black'
         draw_center_text(pos, day, font=font_day_of_week, color=color)
 
     monthCalendar = calendar.monthcalendar(time.year, time.month)
+    calendar.setfirstweekday(calendar.MONDAY)
+
     for rowIndex in range(len(monthCalendar)):
         for monthDay in monthCalendar[rowIndex]:
             pos = (calendar_col(monthCalendar[rowIndex].index(monthDay)),
                    calendar_row(rowIndex))
-            color = 'red' if monthDay == dayOfMonth else 'black'
+            color = 'red' if monthDay == day_of_month else 'black'
             text = str(monthDay) if not monthDay == 0 else ''
             draw_center_text(pos, text, font=font_month_day, color=color)
 
