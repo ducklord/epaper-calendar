@@ -22,7 +22,6 @@ location = "Aalborg, DK"
 EPD_WIDTH = 384
 EPD_HEIGHT = 640
 FILE_PATH = path.dirname(path.realpath(__file__))
-WEATHER_ICONS_PATH = path.join(FILE_PATH, 'weather-icons')
 FONTS_PATH = path.join(FILE_PATH, 'fonts')
 
 
@@ -162,7 +161,6 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
         print('Temperature: ' + temperature + ' °C')
         print('Humidity: ' + humidity + '%')
         print('Icon code: ' + weathericon)
-        print('weather-icon name: ' + weathericons[weathericon])
         print('Wind speed: ' + windspeed + 'm/s')
         print('Sunrise-time: ' + sunrisetime)
         print('Sunset time: ' + sunsettime)
@@ -202,17 +200,10 @@ draw_weather((EPD_WIDTH / 2, 45), EPD_WIDTH / 2, font_size_windspeed = 18, font_
 
 seperator_pos = 270
 seperator_height = 4
+drawBlack.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
+drawRed.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
 drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
 drawRed.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
-
-
-
-
-
-
-
-
-
 
 #image.rotate(90, expand=True)
 imageBlack.save('output_black.bmp')
