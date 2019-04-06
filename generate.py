@@ -3,8 +3,6 @@
 
 import pyowm
 import calendar
-import locale
-import math
 from os import path
 from datetime import datetime, date, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -16,7 +14,6 @@ Copyright bullshit stuff.
 """Settings:"""
 api_key = ""
 location = "Aalborg, DK"
-
 
 """Defines:"""
 EPD_WIDTH = 384
@@ -91,15 +88,6 @@ def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day
     font_month_day = ImageFont.truetype(font_path, font_size_month_day)
 
     days_in_week = list(map(lambda i: date(2019, 4, i + 1).strftime("%a"), range(7)))
-    # days_in_week = [
-    #     locale.ABDAY_1,
-    #     locale.ABDAY_2,
-    #     locale.ABDAY_3,
-    #     locale.ABDAY_4,
-    #     locale.ABDAY_5,
-    #     locale.ABDAY_6,
-    #     locale.ABDAY_7
-    # ]
     
     day_of_week = time.weekday()
     day_of_month = time.day
@@ -177,29 +165,27 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
         pos_weather_icon = (width / 2 + offset[0], pos_windspeed[1] + font_size_windspeed / 2 + font_size_weather_icon / 2 + sep_weather_icon)
         pos_temperature = (width / 2 + offset[0],  pos_weather_icon[1] + font_size_weather_icon / 2 + font_size_temperature / 2)
         pos_humidity = (width / 2 + offset[0], 150 + offset[1])
-        pos_description = (width / 2 + offset[0], 150 + offset[1])
+        pos_description = (width / 2 + offset[0], pos_temperature[1] + font_size_temperature / 2 + font_size_description)
 
         draw_center_text(pos_windspeed, windspeed + " m/s", font=font_windspeed)
         draw_center_text(pos_weather_icon, weather_icon_font_map[weathericon], font=font_weather_icon)
         draw_center_text(pos_temperature, temperature + "°C", font=font_temperature)
         #draw_center_text(pos_humidity, humidity + " %", font=font_humidity)
-        #draw_center_text(pos_description, weather_description, font=font_description)
-        
+        draw_center_text(pos_description, weather_description, font=font_description, color='red')
     else:
         """If no response was received from the openweathermap
         api server, add the cloud with question mark"""
         imageBlack.paste(no_response, (114, 0))
-        
 
 
 
 """Add the line seperating the weather and Calendar section"""
 draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5)
 draw_calendar((0, 130), EPD_WIDTH / 2, font_size_day_of_week = 10, font_size_month_day = 14, seperation = 5)
-draw_weather((EPD_WIDTH / 2, 45), EPD_WIDTH / 2, font_size_windspeed = 18, font_size_weather_icon = 120, font_size_temperature = 50, sep_weather_icon = -15)
+draw_weather((EPD_WIDTH / 2, 45), EPD_WIDTH / 2, font_size_windspeed = 18, font_size_weather_icon = 120, font_size_temperature = 50, font_size_description = 10, sep_weather_icon = -15)
 
 seperator_pos = 270
-seperator_height = 4
+seperator_height = 1
 drawBlack.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
 drawRed.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
 drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
