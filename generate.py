@@ -182,9 +182,6 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
         pos_description = (width / 2 + offset[0], 150 + offset[1])
 
         draw_center_text(pos_windspeed, windspeed + " m/s", font=font_windspeed)
-        # TODO: change into using a font.
-        # image = Image.open(path.join(WEATHER_ICONS_PATH, weathericons[weathericon]))
-        # imageBlack.paste(image, pos_weather_icon)
         draw_center_text(pos_weather_icon, weather_icon_font_map[weathericon], font=font_weather_icon)
         draw_center_text(pos_temperature, temperature + "°C", font=font_temperature)
         #draw_center_text(pos_humidity, humidity + " %", font=font_humidity)
