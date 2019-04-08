@@ -68,13 +68,20 @@ def draw_center_text(position, text, font=font, color='black'):
         drawBlack.text((position[0] - text_width / 2,
                         position[1] - text_height / 2),
                        text, font=font)
-    else:
+    elif color == 'red':
         drawBlack.text((position[0] - text_width / 2,
                         position[1] - text_height / 2),
                        text, font=font)
         drawRed.text((position[0] - text_width / 2,
                       position[1] - text_height / 2),
                      text, font=font)
+    else:
+        drawBlack.text((position[0] - text_width / 2,
+                        position[1] - text_height / 2),
+                       text, font=font, fill='white')
+        drawRed.text((position[0] - text_width / 2,
+                      position[1] - text_height / 2),
+                     text, font=font, fill='white')
 
 def draw_left_text(position, text, font=font, color='black'):
     text_width, text_height = font.getsize(text)
@@ -242,12 +249,14 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_day = 20
         if not currentDate == eventDate:
             currentDate = eventDate
             if eventDate == datetime.now().date():
+                drawRed.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
+                drawBlack.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
                 drawRed.rectangle(((0, y), (70, y + font_size_day + 3)))
                 drawBlack.rectangle(((0, y), (70, y + font_size_day + 3)))
             else:
-                drawBlack.rectangle(((0, y), (70, y + font_size_day + 3)))
+                drawBlack.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
             y += 1
-            draw_center_text((70 / 2, y + font_size_day / 2), currentDate.strftime('%d/%m'), font=font_day, color=color)
+            draw_center_text((70 / 2, y + font_size_day / 2), currentDate.strftime('%d/%m'), font=font_day, color='white')
             y += font_size_day + seperator
 
         draw_left_text((10 + offset[0], y + font_size / 2), eventDateTime.strftime('%H:%M') + ' - ' + event['summary'], font=font, color=color)
