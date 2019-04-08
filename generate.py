@@ -1,11 +1,17 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import pyowm
 import calendar
+import pickle
 from os import path
 from datetime import datetime, date, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
 
 """
 Copyright bullshit stuff.
@@ -20,7 +26,7 @@ EPD_WIDTH = 384
 EPD_HEIGHT = 640
 FILE_PATH = path.dirname(path.realpath(__file__))
 FONTS_PATH = path.join(FILE_PATH, 'fonts')
-
+CREDENTIALS_SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
 font_path = path.join(FONTS_PATH, 'DejaVuSans-Bold.ttf')
 font_weather_icon_path = path.join(FONTS_PATH, 'meteocons.ttf')
@@ -70,20 +76,34 @@ def draw_center_text(position, text, font=font, color='black'):
                       position[1] - text_height / 2),
                      text, font=font)
 
+def draw_left_text(position, text, font=font, color='black'):
+    text_width, text_height = font.getsize(text)
+    if color == 'black':
+        drawBlack.text((position[0],
+                        position[1] - text_height / 2),
+                       text, font=font)
+    else:
+        drawBlack.text((position[0],
+                        position[1] - text_height / 2),
+                       text, font=font)
+        drawRed.text((position[0],
+                      position[1] - text_height / 2),
+                     text, font=font)
 
-def draw_date(center_pos, font_size_day = 20, font_size_date = 20, font_size_year = 20, time = datetime.now(), sep_year = 0):
+
+def draw_date(center_pos, font_size_day = 20, font_size_date = 20, font_size_year = 20, time = datetime.now(), sep_year = 0, color = 'black'):
     font_day = ImageFont.truetype(font_path, font_size_day)
     font_date = ImageFont.truetype(font_path, font_size_date)
     font_year = ImageFont.truetype(font_path, font_size_year)
     pos_year = (center_pos[0], center_pos[1] - font_size_year / 2 - font_size_date / 2 - sep_year)
     pos_date = center_pos
     pos_day = (center_pos[0], center_pos[1] + font_size_day / 2 + font_size_date / 2)
-    draw_center_text(pos_year, time.strftime("%Y"), font=font_year, color='red')
-    draw_center_text(pos_date, time.strftime("%-d %B"), font=font_date)
-    draw_center_text(pos_day, time.strftime("%A"), font=font_day)
+    draw_center_text(pos_year, time.strftime("%Y"), font = font_year, color = 'red')
+    draw_center_text(pos_date, time.strftime("%-d %B"), font = font_date, color = color)
+    draw_center_text(pos_day, time.strftime("%A"), font = font_day, color = color)
 
 """Draw the caleandar"""
-def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day = 20, seperation = 20, time = datetime.now()):
+def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day = 20, seperation = 20, color = 'black', time = datetime.now()):
     font_day_of_week = ImageFont.truetype(font_path, font_size_day_of_week)
     font_month_day = ImageFont.truetype(font_path, font_size_month_day)
 
@@ -100,8 +120,8 @@ def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day
 
     for index, day in enumerate(days_in_week):
         pos = (calendar_col(index), row_day_of_week)
-        color = 'red' if index == day_of_week else 'black'
-        draw_center_text(pos, day, font=font_day_of_week, color=color)
+        day_color = 'red' if index == day_of_week else color
+        draw_center_text(pos, day, font=font_day_of_week, color=day_color)
 
     monthCalendar = calendar.monthcalendar(time.year, time.month)
     calendar.setfirstweekday(calendar.MONDAY)
@@ -110,9 +130,9 @@ def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day
         for monthDay in monthCalendar[rowIndex]:
             pos = (calendar_col(monthCalendar[rowIndex].index(monthDay)),
                    calendar_row(rowIndex))
-            color = 'red' if monthDay == day_of_month else 'black'
+            day_color = 'red' if monthDay == day_of_month else color
             text = str(monthDay) if not monthDay == 0 else ''
-            draw_center_text(pos, text, font=font_month_day, color=color)
+            draw_center_text(pos, text, font=font_month_day, color=day_color)
 
 
 """Draw the weather section of the image."""
@@ -120,40 +140,41 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
     owm = pyowm.OWM(api_key)
     """Connect to Openweathermap API to fetch weather data"""
     print("Connecting to Openweathermap API servers...")
-    # if owm.is_API_online() is True:
-    if True:
-        # observation = owm.weather_at_place(location)
-        # print("weather data:")
-        # weather = observation.get_weather()
-        # weathericon = weather.get_weather_icon_name()
-        # humidity = str(weather.get_humidity())
-        # cloudstatus = str(weather.get_clouds())
-        # weather_description = (str(weather.get_status()))
-        # temperature = str(int(weather.get_temperature(unit='celsius')['temp']))
-        # windspeed = str(int(weather.get_wind()['speed']))
-        # sunrisetime = str(datetime.fromtimestamp(
-        #     int(weather.get_sunrise_time(timeformat='unix'))).strftime('%-H:%M'))
-        # sunsettime = str(datetime.fromtimestamp(
-        #     int(weather.get_sunset_time(timeformat='unix'))).strftime('%-H:%M'))
-
-        weathericon = '04d'
-        humidity = '20000'
-        cloudstatus = '100'
-        weather_description = 'cloudy'
-        temperature = '20'
-        windspeed = '1213'
-        sunrisetime = '06:06'
-        sunsettime = '20:20'
+    testing = True
+    if testing or owm.is_API_online() is True:
+        if not testing:
+            observation = owm.weather_at_place(location)
+            print("weather data:")
+            weather = observation.get_weather()
+            weathericon = weather.get_weather_icon_name()
+            humidity = str(weather.get_humidity())
+            cloudstatus = str(weather.get_clouds())
+            weather_description = (str(weather.get_status()))
+            temperature = str(int(weather.get_temperature(unit='celsius')['temp']))
+            windspeed = str(int(weather.get_wind()['speed']))
+            sunrisetime = str(datetime.fromtimestamp(
+                int(weather.get_sunrise_time(timeformat='unix'))).strftime('%-H:%M'))
+            sunsettime = str(datetime.fromtimestamp(
+                int(weather.get_sunset_time(timeformat='unix'))).strftime('%-H:%M'))
+        else:
+            weathericon = '01d'
+            humidity = '67'
+            cloudstatus = '0'
+            weather_description = 'Clear'
+            temperature = '13'
+            windspeed = '1'
+            sunrisetime = '6:34'
+            sunsettime = '20:10'
 
         """Debug print"""
-        print('Temperature: ' + temperature + ' °C')
-        print('Humidity: ' + humidity + '%')
-        print('Icon code: ' + weathericon)
-        print('Wind speed: ' + windspeed + 'm/s')
-        print('Sunrise-time: ' + sunrisetime)
-        print('Sunset time: ' + sunsettime)
-        print('Cloudiness: ' + cloudstatus + '%')
-        print('Weather description: ' + weather_description + '\n')
+        print('weathericon = \'' + weathericon + '\'')
+        print('humidity = \'' + humidity + '\'')
+        print('cloudstatus = \'' + cloudstatus + '\'')
+        print('weather_description = \'' + weather_description + '\'')
+        print('temperature = \'' + temperature + '\'')
+        print('windspeed = \'' + windspeed + '\'')
+        print('sunrisetime = \'' + sunrisetime + '\'')
+        print('sunsettime = \'' + sunsettime + '\'')
 
         font_windspeed = ImageFont.truetype(font_path, font_size_windspeed)
         font_weather_icon = ImageFont.truetype(font_weather_icon_path, font_size_weather_icon)
@@ -178,19 +199,86 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
         imageBlack.paste(no_response, (114, 0))
 
 
+def get_calendar_events():
+    creds = None
+    if path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+            
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', CREDENTIALS_SCOPES)
+            creds = flow.run_local_server()
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
 
-"""Add the line seperating the weather and Calendar section"""
-draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5)
-draw_calendar((0, 130), EPD_WIDTH / 2, font_size_day_of_week = 10, font_size_month_day = 14, seperation = 5)
-draw_weather((EPD_WIDTH / 2, 45), EPD_WIDTH / 2, font_size_windspeed = 18, font_size_weather_icon = 120, font_size_temperature = 50, font_size_description = 10, sep_weather_icon = -15)
+    service = build('calendar', 'v3', credentials=creds)
 
-seperator_pos = 270
-seperator_height = 1
-drawBlack.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
-drawRed.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
-drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
-drawRed.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
+    # Call the Calendar API
+    now = datetime.utcnow().isoformat() + 'Z'
+    sevenDaysFromNow = (datetime.utcnow() + timedelta(days=7)).isoformat() + 'Z'
+    events_result = service.events().list(calendarId='primary',
+                                          timeMin=now,
+                                          timeMax=sevenDaysFromNow,
+                                          maxResults=10,
+                                          singleEvents=True,
+                                          orderBy='startTime').execute()
+    return events_result.get('items', [])
 
-#image.rotate(90, expand=True)
-imageBlack.save('output_black.bmp')
-imageRed.save('output_red.bmp')
+
+def draw_calendar_events(offset, events = [], font_size = 20, font_size_day = 20, seperator = 0):
+    y = offset[1]
+    font_day = ImageFont.truetype(font_path, font_size_day)
+    font = ImageFont.truetype(font_path, font_size)
+    currentDate = None
+
+    for event in events:
+        eventDateTime = datetime.fromisoformat(event['start'].get('dateTime', event['start'].get('date')))
+        eventDate = eventDateTime.date()
+        color = 'red' if eventDate == datetime.now().date() else 'black'
+        if not currentDate == eventDate:
+            currentDate = eventDate
+            if eventDate == datetime.now().date():
+                drawRed.rectangle(((0, y), (70, y + font_size_day + 3)))
+                drawBlack.rectangle(((0, y), (70, y + font_size_day + 3)))
+            else:
+                drawBlack.rectangle(((0, y), (70, y + font_size_day + 3)))
+            y += 1
+            draw_center_text((70 / 2, y + font_size_day / 2), currentDate.strftime('%d/%m'), font=font_day, color=color)
+            y += font_size_day + seperator
+
+        draw_left_text((10 + offset[0], y + font_size / 2), eventDateTime.strftime('%H:%M') + ' - ' + event['summary'], font=font, color=color)
+        y += font_size + seperator
+
+
+
+
+
+
+
+
+
+def main():
+    """Add the line seperating the weather and Calendar section"""
+    draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color='black')
+    draw_calendar((0, 130), EPD_WIDTH / 2, font_size_day_of_week = 11, font_size_month_day = 14, seperation = 5)
+    draw_weather((EPD_WIDTH / 2, 45), EPD_WIDTH / 2, font_size_windspeed = 18, font_size_weather_icon = 120, font_size_temperature = 50, font_size_description = 10, sep_weather_icon = 0)
+
+    seperator_pos = 270
+    seperator_height = 1
+    drawBlack.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
+    drawRed.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
+    drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
+    drawRed.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
+
+    draw_calendar_events((0, seperator_pos + seperator_height), events = get_calendar_events(), font_size = 18, font_size_day = 18, seperator = 5)
+
+    #image.rotate(90, expand=True)
+    imageBlack.save('output_black.bmp')
+    imageRed.save('output_red.bmp')
+    
+if __name__ == '__main__':
+    main()
