@@ -270,16 +270,17 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
 
 
 
+seperator_pos = 270
+seperator_height = 1
 
 
 def main():
     """Add the line seperating the weather and Calendar section"""
-    draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color='black')
-    draw_calendar((0, 130), EPD_WIDTH / 2, font_size_day_of_week = 11, font_size_month_day = 14, seperation = 5)
+    drawRed.rectangle(((0, 0), (EPD_WIDTH / 2, seperator_pos)), fill='black')
+    draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color = 'white', color_year = 'black')
+    draw_calendar((0, 130), EPD_WIDTH / 2, font_size_day_of_week = 11, font_size_month_day = 14, seperation = 5, color = 'white', color_current = 'black')
     draw_weather((EPD_WIDTH / 2, 45), EPD_WIDTH / 2, font_size_windspeed = 18, font_size_weather_icon = 120, font_size_temperature = 50, font_size_description = 10, sep_weather_icon = 0)
 
-    seperator_pos = 270
-    seperator_height = 1
     drawBlack.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
     drawRed.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
     drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
