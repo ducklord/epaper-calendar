@@ -281,10 +281,8 @@ def main():
     draw_calendar((0, 130), EPD_WIDTH / 2, font_size_day_of_week = 11, font_size_month_day = 14, seperation = 5, color = 'white', color_current = 'black')
     draw_weather((EPD_WIDTH / 2, 45), EPD_WIDTH / 2, font_size_windspeed = 18, font_size_weather_icon = 120, font_size_temperature = 50, font_size_description = 10, sep_weather_icon = 0)
 
-    drawBlack.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
-    drawRed.rectangle(((EPD_WIDTH / 2, 0), (EPD_WIDTH / 2 + 1, seperator_pos)), fill='black')
-    drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
-    drawRed.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
+
+    drawBlack.rectangle(((EPD_WIDTH / 2, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height - 1)), fill='black')
 
     draw_calendar_events((2, seperator_pos + seperator_height + 3), events = get_calendar_events(), font_size = 16, seperator = 5)
 
