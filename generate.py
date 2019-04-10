@@ -236,9 +236,14 @@ def get_calendar_events():
     return events_result.get('items', [])
 
 
-def draw_calendar_events(offset, events = [], font_size = 20, font_size_day = 20, seperator = 0):
+def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 13, font_size_day = 25, font_size_month = 10, seperator = 0):
     y = offset[1]
+    month_x = offset[0]
+    month_seperator = 2
+    month_width = 42
     font_day = ImageFont.truetype(font_path, font_size_day)
+    font_month = ImageFont.truetype(font_path, font_size_month)
+    font_time = ImageFont.truetype(font_path, font_size_time)
     font = ImageFont.truetype(font_path, font_size)
     currentDate = None
 
@@ -247,19 +252,29 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_day = 20
         eventDate = eventDateTime.date()
         color = 'red' if eventDate == datetime.now().date() else 'black'
         if not currentDate == eventDate:
+            # Draw event date.
             currentDate = eventDate
-            if eventDate == datetime.now().date():
-                drawRed.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
-                drawBlack.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
-                drawRed.rectangle(((0, y), (70, y + font_size_day + 3)))
-                drawBlack.rectangle(((0, y), (70, y + font_size_day + 3)))
-            else:
-                drawBlack.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
-            y += 1
-            draw_center_text((70 / 2, y + font_size_day / 2), currentDate.strftime('%d/%m'), font=font_day, color='white')
-            y += font_size_day + seperator
+            # if eventDate == datetime.now().date():
+            #     drawRed.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
+            #     drawBlack.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
+            #     drawRed.rectangle(((0, y), (70, y + font_size_day + 3)))
+            #     drawBlack.rectangle(((0, y), (70, y + font_size_day + 3)))
+            # else:
+            #     drawBlack.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
+            # y += 1
+            # draw_center_text((70 / 2, y + font_size_day / 2), currentDate.strftime('%d/%m'), font=font_day, color='white')
+            # y += font_size_day + seperator
 
-        draw_left_text((10 + offset[0], y + font_size / 2), eventDateTime.strftime('%H:%M') + ' - ' + event['summary'], font=font, color=color)
+            drawBlack.rectangle(((month_x, y), (month_x + month_width, y + font_size_day + 2 + month_seperator + font_size_month + month_seperator)))
+            draw_center_text((month_x + month_width / 2, y + font_size_day / 2), currentDate.strftime('%d'), font=font_day, color='black')
+            drawBlack.rectangle(((month_x + 1, y + font_size_day + 2), (month_x + month_width - 1, y + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), fill = 'black')
+            drawRed.rectangle(((month_x + 1, y + font_size_day + 2), (month_x + month_width - 1, y + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), fill = 'black')
+            draw_center_text((month_x + month_width / 2, y + font_size_day + 2 + month_seperator + font_size_month / 2), currentDate.strftime('%b'), font=font_month, color='white')
+            y += font_size_day + 2 + month_seperator + font_size_month + month_seperator + 3
+
+        # Draw the event it self.
+        draw_center_text((month_x + month_width / 2, y + font_size / 2), eventDateTime.strftime('%H:%M'), font=font_time, color=color)
+        draw_left_text((month_x + month_width + 7, y + font_size / 2), event['summary'], font=font, color=color)
         y += font_size + seperator
 
 
@@ -283,7 +298,7 @@ def main():
     drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
     drawRed.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height)), fill='black')
 
-    draw_calendar_events((0, seperator_pos + seperator_height), events = get_calendar_events(), font_size = 18, font_size_day = 18, seperator = 5)
+    draw_calendar_events((2, seperator_pos + seperator_height + 3), events = get_calendar_events(), font_size = 16, seperator = 5)
 
     #image.rotate(90, expand=True)
     imageBlack.save('output_black.bmp')
