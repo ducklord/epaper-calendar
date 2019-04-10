@@ -64,53 +64,40 @@ drawRed = ImageDraw.Draw(imageRed)
 
 def draw_center_text(position, text, font=font, color='black'):
     text_width, text_height = font.getsize(text)
-    if color == 'black':
-        drawBlack.text((position[0] - text_width / 2,
-                        position[1] - text_height / 2),
-                       text, font=font)
-    elif color == 'red':
-        drawBlack.text((position[0] - text_width / 2,
-                        position[1] - text_height / 2),
-                       text, font=font)
-        drawRed.text((position[0] - text_width / 2,
-                      position[1] - text_height / 2),
-                     text, font=font)
-    else:
-        drawBlack.text((position[0] - text_width / 2,
-                        position[1] - text_height / 2),
-                       text, font=font, fill='white')
-        drawRed.text((position[0] - text_width / 2,
-                      position[1] - text_height / 2),
-                     text, font=font, fill='white')
+    fill_black = 'white' if color == 'white' else 'black'
+    fill_red = 'black' if color == 'red' else 'white'
+    drawBlack.text((position[0] - text_width / 2,
+                    position[1] - text_height / 2),
+                   text, font = font, fill = fill_black)
+    drawRed.text((position[0] - text_width / 2,
+                  position[1] - text_height / 2),
+                 text, font = font, fill = fill_red)
 
 def draw_left_text(position, text, font=font, color='black'):
     text_width, text_height = font.getsize(text)
-    if color == 'black':
-        drawBlack.text((position[0],
-                        position[1] - text_height / 2),
-                       text, font=font)
-    else:
-        drawBlack.text((position[0],
-                        position[1] - text_height / 2),
-                       text, font=font)
-        drawRed.text((position[0],
-                      position[1] - text_height / 2),
-                     text, font=font)
+    fill_black = 'white' if color == 'white' else 'black'
+    fill_red = 'black' if color == 'red' else 'white'
+    drawBlack.text((position[0],
+                    position[1] - text_height / 2),
+                   text, font = font, fill = fill_black)
+    drawRed.text((position[0],
+                  position[1] - text_height / 2),
+                 text, font = font, fill = fill_red)
 
 
-def draw_date(center_pos, font_size_day = 20, font_size_date = 20, font_size_year = 20, time = datetime.now(), sep_year = 0, color = 'black'):
+def draw_date(center_pos, font_size_day = 20, font_size_date = 20, font_size_year = 20, time = datetime.now(), sep_year = 0, color = 'black', color_year = 'red'):
     font_day = ImageFont.truetype(font_path, font_size_day)
     font_date = ImageFont.truetype(font_path, font_size_date)
     font_year = ImageFont.truetype(font_path, font_size_year)
     pos_year = (center_pos[0], center_pos[1] - font_size_year / 2 - font_size_date / 2 - sep_year)
     pos_date = center_pos
     pos_day = (center_pos[0], center_pos[1] + font_size_day / 2 + font_size_date / 2)
-    draw_center_text(pos_year, time.strftime("%Y"), font = font_year, color = 'red')
+    draw_center_text(pos_year, time.strftime("%Y"), font = font_year, color = color_year)
     draw_center_text(pos_date, time.strftime("%-d %B"), font = font_date, color = color)
     draw_center_text(pos_day, time.strftime("%A"), font = font_day, color = color)
 
 """Draw the caleandar"""
-def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day = 20, seperation = 20, color = 'black', time = datetime.now()):
+def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day = 20, seperation = 20, color = 'black', color_current = 'red', time = datetime.now()):
     font_day_of_week = ImageFont.truetype(font_path, font_size_day_of_week)
     font_month_day = ImageFont.truetype(font_path, font_size_month_day)
 
@@ -127,7 +114,7 @@ def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day
 
     for index, day in enumerate(days_in_week):
         pos = (calendar_col(index), row_day_of_week)
-        day_color = 'red' if index == day_of_week else color
+        day_color = color_current if index == day_of_week else color
         draw_center_text(pos, day, font=font_day_of_week, color=day_color)
 
     monthCalendar = calendar.monthcalendar(time.year, time.month)
@@ -137,7 +124,7 @@ def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day
         for monthDay in monthCalendar[rowIndex]:
             pos = (calendar_col(monthCalendar[rowIndex].index(monthDay)),
                    calendar_row(rowIndex))
-            day_color = 'red' if monthDay == day_of_month else color
+            day_color = color_current if monthDay == day_of_month else color
             text = str(monthDay) if not monthDay == 0 else ''
             draw_center_text(pos, text, font=font_month_day, color=day_color)
 
