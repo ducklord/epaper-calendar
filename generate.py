@@ -207,25 +207,25 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
 
 
 def get_calendar_events():
-    creds = None
+    google_credentials = None
     if path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
+            google_credentials = pickle.load(token)
             
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+    if not google_credentials or not google_credentials.valid:
+        if google_credentials and google_credentials.expired and google_credentials.refresh_token:
+            google_credentials.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file('credentials.json', CREDENTIALS_SCOPES)
-            creds = flow.run_local_server()
+            google_credentials = flow.run_local_server()
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
+            pickle.dump(google_credentials, token)
 
-    service = build('calendar', 'v3', credentials=creds)
+    service = build('calendar', 'v3', credentials = google_credentials)
 
     # Call the Calendar API
-    now = datetime.utcnow().isoformat() + 'Z'
+    now = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0).isoformat() + 'Z'
     sevenDaysFromNow = (datetime.utcnow() + timedelta(days=7)).isoformat() + 'Z'
     events_result = service.events().list(calendarId='primary',
                                           timeMin=now,
