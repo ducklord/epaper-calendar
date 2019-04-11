@@ -264,17 +264,9 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
         draw_left_text((month_x + month_width + 7, y + font_size / 2), event['summary'], font=font, color=color)
         y += font_size + seperator
 
-
-
-
-
-
-
-seperator_pos = 250
-seperator_height = 1
-
-
 def main():
+    seperator_pos = 250
+
     # Draw date in a red square in left side.
     drawRed.rectangle(((0, 0), (EPD_WIDTH / 2, 130)), fill='black')
     draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color = 'white', color_year = 'white')
@@ -287,10 +279,10 @@ def main():
 
     # Draw borders between sections.
     drawBlack.rectangle(((EPD_WIDTH / 2, 130), (EPD_WIDTH / 2, seperator_pos)), fill='black')
-    drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos + seperator_height - 1)), fill='black')
+    drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos)), fill='black')
 
     # Draw the list of all calendar events
-    draw_calendar_events((2, seperator_pos + seperator_height + 3), events = get_calendar_events(), font_size = 16, seperator = 5)
+    draw_calendar_events((2, seperator_pos + 4), events = get_calendar_events(), font_size = 16, seperator = 5)
 
     # Output the images.
     #image.rotate(90, expand=True)
