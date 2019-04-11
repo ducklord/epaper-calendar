@@ -265,8 +265,6 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
         y += font_size + seperator
 
 def main():
-    seperator_pos = 250
-
     # Draw date in a red square in left side.
     drawRed.rectangle(((0, 0), (EPD_WIDTH / 2, 130)), fill='black')
     draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color = 'white', color_year = 'white')
@@ -278,6 +276,7 @@ def main():
     draw_weather((EPD_WIDTH / 2, 20), EPD_WIDTH / 2, font_size_windspeed = 18, font_size_weather_icon = 120, font_size_temperature = 50, font_size_description = 10, sep_weather_icon = 0)
 
     # Draw borders between sections.
+    seperator_pos = 250
     drawBlack.rectangle(((EPD_WIDTH / 2, 130), (EPD_WIDTH / 2, seperator_pos)), fill='black')
     drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos)), fill='black')
 
