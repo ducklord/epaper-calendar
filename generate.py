@@ -20,6 +20,7 @@ Copyright bullshit stuff.
 """Settings:"""
 api_key = ""
 location = "Aalborg, DK"
+testing = True
 
 """Defines:"""
 EPD_WIDTH = 384
@@ -134,7 +135,6 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
     owm = pyowm.OWM(api_key)
     """Connect to Openweathermap API to fetch weather data"""
     print("Connecting to Openweathermap API servers...")
-    testing = True
     if testing or owm.is_API_online() is True:
         if not testing:
             observation = owm.weather_at_place(location)
