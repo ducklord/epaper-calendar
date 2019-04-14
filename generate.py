@@ -150,15 +150,17 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
                 int(weather.get_sunrise_time(timeformat='unix'))).strftime('%-H:%M'))
             sunsettime = str(datetime.fromtimestamp(
                 int(weather.get_sunset_time(timeformat='unix'))).strftime('%-H:%M'))
+            rose_weather = weather.get_wind()['speed'] < 6 and weather.get_temperature(unit='celsius')['temp'] > 20
         else:
             weathericon = '01d'
-            humidity = '67'
-            cloudstatus = '0'
+            humidity = '54'
+            cloudstatus = '8'
             weather_description = 'Clear'
-            temperature = '13'
-            windspeed = '1'
-            sunrisetime = '6:34'
-            sunsettime = '20:10'
+            temperature = '22'
+            windspeed = '3'
+            sunrisetime = '6:15'
+            sunsettime = '20:25'
+            rose_weather = True
 
         """Debug print"""
         print('weathericon = \'' + weathericon + '\'')
@@ -169,6 +171,7 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
         print('windspeed = \'' + windspeed + '\'')
         print('sunrisetime = \'' + sunrisetime + '\'')
         print('sunsettime = \'' + sunsettime + '\'')
+        print('rose_weather = ' + str(rose_weather))
 
         font_windspeed = ImageFont.truetype(font_path, font_size_windspeed)
         font_weather_icon = ImageFont.truetype(font_weather_icon_path, font_size_weather_icon)
@@ -178,15 +181,21 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
         
         pos_windspeed = (width / 2 + offset[0], font_size_windspeed / 2 + offset[1])
         pos_weather_icon = (width / 2 + offset[0], pos_windspeed[1] + font_size_windspeed / 2 + font_size_weather_icon / 2 + sep_weather_icon)
+        pos_rose = (int(width / 2 + offset[0] - 66), int(pos_weather_icon[1] + 20))
         pos_temperature = (width / 2 + offset[0],  pos_weather_icon[1] + font_size_weather_icon / 2 + font_size_temperature / 2)
         pos_humidity = (width / 2 + offset[0], 150 + offset[1])
         pos_description = (width / 2 + offset[0], pos_temperature[1] + font_size_temperature / 2 + font_size_description)
 
         draw_center_text(pos_windspeed, windspeed + " m/s", font=font_windspeed)
+        if rose_weather:
+            imageBlack.paste(Image.open(path.join('gfx', 'glass_black.bmp')), pos_rose)
         draw_center_text(pos_weather_icon, weather_icon_font_map[weathericon], font=font_weather_icon)
+        if rose_weather:
+            imageRed.paste(Image.open(path.join('gfx', 'glass_red.bmp')), pos_rose)
         draw_center_text(pos_temperature, temperature + "°C", font=font_temperature)
         #draw_center_text(pos_humidity, humidity + " %", font=font_humidity)
         draw_center_text(pos_description, weather_description, font=font_description, color='red')
+
     else:
         """If no response was received from the openweathermap
         api server, add the cloud with question mark"""
