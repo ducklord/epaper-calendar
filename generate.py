@@ -63,19 +63,18 @@ drawRed = ImageDraw.Draw(imageRed)
 
 """Define helper functions"""
 
-def draw_center_text(position, text, font=font, color='black'):
+def draw_center_text(position, text, font = font, color = 'black'):
     x, y = position
-    text_width, text_height = font.getsize(text)
+    text_width, text_height = drawBlack.textsize(text, font = font)
     fill_black = 'white' if color == 'white' else 'black'
     fill_red = 'black' if color == 'red' else 'white'
-    drawBlack.text((x - text_width / 2, y - text_height / 2),
-                   text, font = font, fill = fill_black)
-    drawRed.text((x - text_width / 2, y - text_height / 2),
-                 text, font = font, fill = fill_red)
+    center_pos = (x - text_width / 2, y - text_height / 2)
+    drawBlack.text(center_pos, text, font = font, fill = fill_black, align = "center")
+    drawRed.text(center_pos, text, font = font, fill = fill_red, align = "center")
 
-def draw_left_text(position, text, font=font, color='black'):
+def draw_left_text(position, text, font = font, color = 'black'):
     x, y = position
-    text_width, text_height = font.getsize(text)
+    text_width, text_height = drawBlack.textsize(text, font = font)
     fill_black = 'white' if color == 'white' else 'black'
     fill_red = 'black' if color == 'red' else 'white'
     drawBlack.text((x, y - text_height / 2),
