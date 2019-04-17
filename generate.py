@@ -134,9 +134,9 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
     x, y = offset
     owm = pyowm.OWM(api_key)
     """Connect to Openweathermap API to fetch weather data"""
-    print("Connecting to Openweathermap API servers...")
-    if testing or owm.is_API_online() is True:
+    if testing or owm.is_API_online():
         if not testing:
+            print("Connecting to Openweathermap API servers...")
             observation = owm.weather_at_place(location)
             print("weather data:")
             weather = observation.get_weather()
