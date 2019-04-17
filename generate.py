@@ -186,20 +186,21 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
         pos_humidity = (width / 2 + x, 150 + y)
         pos_description = (width / 2 + x, pos_temperature[1] + font_size_temperature / 2 + font_size_description)
 
-        draw_center_text(pos_windspeed, windspeed + " m/s", font=font_windspeed)
+        draw_center_text(pos_windspeed, "{} m/s".format(windspeed), font=font_windspeed)
         if rose_weather:
             imageBlack.paste(Image.open(path.join('gfx', 'glass_black.bmp')), pos_rose)
         draw_center_text(pos_weather_icon, weather_icon_font_map[weathericon], font=font_weather_icon)
         if rose_weather:
             imageRed.paste(Image.open(path.join('gfx', 'glass_red.bmp')), pos_rose)
-        draw_center_text(pos_temperature, temperature + "°C", font=font_temperature)
+        draw_center_text(pos_temperature, "{}°C".format(temperature), font=font_temperature)
         #draw_center_text(pos_humidity, humidity + " %", font=font_humidity)
         draw_center_text(pos_description, weather_description, font=font_description, color='red')
 
     else:
         """If no response was received from the openweathermap
         api server, add the cloud with question mark"""
-        imageBlack.paste(no_response, (114, 0))
+        font_error = ImageFont.truetype(font_path, 18)
+        draw_center_text((x + width / 2, y + 200 / 2), "Openweathermap\nnot\nresponding", font = font_error, color = 'red')
 
 
 def get_calendar_events():
