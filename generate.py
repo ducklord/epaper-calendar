@@ -141,34 +141,34 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
             print("weather data:")
             weather = observation.get_weather()
             weathericon = weather.get_weather_icon_name()
-            humidity = str(weather.get_humidity())
-            cloudstatus = str(weather.get_clouds())
-            weather_description = (str(weather.get_status()))
-            temperature = str(int(weather.get_temperature(unit='celsius')['temp']))
-            windspeed = str(int(weather.get_wind()['speed']))
+            humidity = weather.get_humidity()
+            cloudstatus = weather.get_clouds()
+            weather_description = weather.get_status()
+            temperature = int(weather.get_temperature(unit='celsius')['temp'])
+            windspeed = int(weather.get_wind()['speed'])
             sunrisetime = str(datetime.fromtimestamp(
                 int(weather.get_sunrise_time(timeformat='unix'))).strftime('%-H:%M'))
             sunsettime = str(datetime.fromtimestamp(
                 int(weather.get_sunset_time(timeformat='unix'))).strftime('%-H:%M'))
-            rose_weather = weather.get_wind()['speed'] < 5 and weather.get_temperature(unit='celsius')['temp'] > 20
+            rose_weather = windspeed < 5 and temperature > 20
         else:
             weathericon = '01d'
-            humidity = '54'
-            cloudstatus = '8'
+            humidity = 54
+            cloudstatus = 8
             weather_description = 'Clear'
-            temperature = '22'
-            windspeed = '3'
+            temperature = 22
+            windspeed = 3
             sunrisetime = '6:15'
             sunsettime = '20:25'
             rose_weather = True
 
         """Debug print"""
         print('weathericon = \'' + weathericon + '\'')
-        print('humidity = \'' + humidity + '\'')
-        print('cloudstatus = \'' + cloudstatus + '\'')
+        print('humidity = ' + str(humidity))
+        print('cloudstatus = ' + str(cloudstatus))
         print('weather_description = \'' + weather_description + '\'')
-        print('temperature = \'' + temperature + '\'')
-        print('windspeed = \'' + windspeed + '\'')
+        print('temperature = ' + str(temperature))
+        print('windspeed = ' + str(windspeed))
         print('sunrisetime = \'' + sunrisetime + '\'')
         print('sunsettime = \'' + sunsettime + '\'')
         print('rose_weather = ' + str(rose_weather))
@@ -193,7 +193,7 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
         if rose_weather:
             imageRed.paste(Image.open(path.join('gfx', 'glass_red.bmp')), pos_rose)
         draw_center_text(pos_temperature, "{}°C".format(temperature), font=font_temperature)
-        #draw_center_text(pos_humidity, humidity + " %", font=font_humidity)
+        #draw_center_text(pos_humidity,  "{} %".format(humidity), font=font_humidity)
         draw_center_text(pos_description, weather_description, font=font_description, color='red')
 
     else:
