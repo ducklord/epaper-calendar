@@ -244,13 +244,13 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
     currentDate = None
 
     for event in events:
-        eventDateTime = datetime.fromisoformat(event['start'].get('dateTime', event['start'].get('date')))
-        eventDate = eventDateTime.date()
-        color = 'red' if eventDate == datetime.now().date() else 'black'
-        if not currentDate == eventDate:
+        eventStartDateTime = datetime.fromisoformat(event['start'].get('dateTime', event['start'].get('date')))
+        eventStartDate = eventStartDateTime.date()
+        color = 'red' if eventStartDate == datetime.now().date() else 'black'
+        if not currentDate == eventStartDate:
             # Draw event date.
-            currentDate = eventDate
-            # if eventDate == datetime.now().date():
+            currentDate = eventStartDate
+            # if eventStartDate == datetime.now().date():
             #     drawRed.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
             #     drawBlack.polygon(((0, y), (EPD_WIDTH, y), (EPD_WIDTH, y + 3), (70, y + font_size_day + 3), (0, y + font_size_day + 3)), fill='black')
             #     drawRed.rectangle(((0, y), (70, y + font_size_day + 3)))
@@ -269,11 +269,12 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
             y += font_size_day + 2 + month_seperator + font_size_month + month_seperator + 3
 
         # Draw the event it self.
-        draw_center_text((month_x + month_width / 2, y + font_size / 2), eventDateTime.strftime('%H:%M'), font=font_time, color=color)
+        draw_center_text((month_x + month_width / 2, y + font_size / 2), eventStartDateTime.strftime('%H:%M'), font=font_time, color=color)
+        # draw_center_text((month_x + month_width / 2, y + font_size / 2), eventStartDateTime.strftime('%H:%M'), font=font_time, color=color)
         draw_left_text((month_x + month_width + 7, y + font_size / 2), event['summary'], font=font, color=color)
         y += font_size + seperator
 
-def main():
+def generate(black_image_path, red_image_path):
     # Draw date in a red square in left side.
     drawRed.rectangle(((0, 0), (EPD_WIDTH / 2, 130)), fill='black')
     draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color = 'white', color_year = 'white')
@@ -294,9 +295,11 @@ def main():
 
     # Output the images.
     #image.rotate(90, expand=True)
-    imageBlack.save('output_black.bmp')
-    imageRed.save('output_red.bmp')
+    imageBlack.save(black_image_path)
+    imageRed.save(red_image_path)
 
+def main():
+    generate('output_black.bmp', 'output_red.bmp')
     
 if __name__ == '__main__':
     main()
