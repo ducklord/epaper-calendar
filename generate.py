@@ -64,41 +64,41 @@ drawRed = ImageDraw.Draw(imageRed)
 """Define helper functions"""
 
 def draw_center_text(position, text, font=font, color='black'):
+    x, y = position
     text_width, text_height = font.getsize(text)
     fill_black = 'white' if color == 'white' else 'black'
     fill_red = 'black' if color == 'red' else 'white'
-    drawBlack.text((position[0] - text_width / 2,
-                    position[1] - text_height / 2),
+    drawBlack.text((x - text_width / 2, y - text_height / 2),
                    text, font = font, fill = fill_black)
-    drawRed.text((position[0] - text_width / 2,
-                  position[1] - text_height / 2),
+    drawRed.text((x - text_width / 2, y - text_height / 2),
                  text, font = font, fill = fill_red)
 
 def draw_left_text(position, text, font=font, color='black'):
+    x, y = position
     text_width, text_height = font.getsize(text)
     fill_black = 'white' if color == 'white' else 'black'
     fill_red = 'black' if color == 'red' else 'white'
-    drawBlack.text((position[0],
-                    position[1] - text_height / 2),
+    drawBlack.text((x, y - text_height / 2),
                    text, font = font, fill = fill_black)
-    drawRed.text((position[0],
-                  position[1] - text_height / 2),
+    drawRed.text((x, y - text_height / 2),
                  text, font = font, fill = fill_red)
 
 
 def draw_date(center_pos, font_size_day = 20, font_size_date = 20, font_size_year = 20, time = datetime.now(), sep_year = 0, color = 'black', color_year = 'red'):
+    x, y = center_pos
     font_day = ImageFont.truetype(font_path, font_size_day)
     font_date = ImageFont.truetype(font_path, font_size_date)
     font_year = ImageFont.truetype(font_path, font_size_year)
-    pos_year = (center_pos[0], center_pos[1] - font_size_year / 2 - font_size_date / 2 - sep_year)
+    pos_year = (x, y - font_size_year / 2 - font_size_date / 2 - sep_year)
     pos_date = center_pos
-    pos_day = (center_pos[0], center_pos[1] + font_size_day / 2 + font_size_date / 2)
+    pos_day = (x, y + font_size_day / 2 + font_size_date / 2)
     draw_center_text(pos_year, time.strftime("%Y"), font = font_year, color = color_year)
     draw_center_text(pos_date, time.strftime("%-d %B"), font = font_date, color = color)
     draw_center_text(pos_day, time.strftime("%A"), font = font_day, color = color)
 
 """Draw the caleandar"""
 def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day = 20, seperation = 20, color = 'black', color_current = 'red', time = datetime.now()):
+    x, y = offset
     font_day_of_week = ImageFont.truetype(font_path, font_size_day_of_week)
     font_month_day = ImageFont.truetype(font_path, font_size_month_day)
 
@@ -107,11 +107,11 @@ def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day
     day_of_week = time.weekday()
     day_of_month = time.day
 
-    row_day_of_week = font_size_day_of_week / 2 + offset[1]
+    row_day_of_week = font_size_day_of_week / 2 + y
     def calendar_row(index):
-        return font_size_day_of_week + font_size_month_day / 2 + font_size_month_day * index + offset[1] + seperation
+        return font_size_day_of_week + font_size_month_day / 2 + font_size_month_day * index + y + seperation
     def calendar_col(index):
-        return width * (index + 1) / 8 + offset[0]
+        return width * (index + 1) / 8 + x
 
     for index, day in enumerate(days_in_week):
         pos = (calendar_col(index), row_day_of_week)
@@ -132,6 +132,7 @@ def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day
 
 """Draw the weather section of the image."""
 def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon = 90, font_size_temperature = 20, font_size_humidity = 20, font_size_description = 20, sep_weather_icon = 0):
+    x, y = offset
     owm = pyowm.OWM(api_key)
     """Connect to Openweathermap API to fetch weather data"""
     print("Connecting to Openweathermap API servers...")
@@ -150,7 +151,7 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
                 int(weather.get_sunrise_time(timeformat='unix'))).strftime('%-H:%M'))
             sunsettime = str(datetime.fromtimestamp(
                 int(weather.get_sunset_time(timeformat='unix'))).strftime('%-H:%M'))
-            rose_weather = weather.get_wind()['speed'] < 6 and weather.get_temperature(unit='celsius')['temp'] > 20
+            rose_weather = weather.get_wind()['speed'] < 5 and weather.get_temperature(unit='celsius')['temp'] > 20
         else:
             weathericon = '01d'
             humidity = '54'
@@ -179,12 +180,12 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
         font_humidity = ImageFont.truetype(font_path, font_size_humidity)
         font_description = ImageFont.truetype(font_path, font_size_description)
         
-        pos_windspeed = (width / 2 + offset[0], font_size_windspeed / 2 + offset[1])
-        pos_weather_icon = (width / 2 + offset[0], pos_windspeed[1] + font_size_windspeed / 2 + font_size_weather_icon / 2 + sep_weather_icon)
-        pos_rose = (int(width / 2 + offset[0] - 66), int(pos_weather_icon[1] + 20))
-        pos_temperature = (width / 2 + offset[0],  pos_weather_icon[1] + font_size_weather_icon / 2 + font_size_temperature / 2)
-        pos_humidity = (width / 2 + offset[0], 150 + offset[1])
-        pos_description = (width / 2 + offset[0], pos_temperature[1] + font_size_temperature / 2 + font_size_description)
+        pos_windspeed = (width / 2 + x, font_size_windspeed / 2 + y)
+        pos_weather_icon = (width / 2 + x, pos_windspeed[1] + font_size_windspeed / 2 + font_size_weather_icon / 2 + sep_weather_icon)
+        pos_rose = (int(width / 2 + x - 66), int(pos_weather_icon[1] + 20))
+        pos_temperature = (width / 2 + x,  pos_weather_icon[1] + font_size_weather_icon / 2 + font_size_temperature / 2)
+        pos_humidity = (width / 2 + x, 150 + y)
+        pos_description = (width / 2 + x, pos_temperature[1] + font_size_temperature / 2 + font_size_description)
 
         draw_center_text(pos_windspeed, windspeed + " m/s", font=font_windspeed)
         if rose_weather:
@@ -233,8 +234,7 @@ def get_calendar_events():
 
 
 def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 13, font_size_day = 25, font_size_month = 10, seperator = 0):
-    y = offset[1]
-    month_x = offset[0]
+    month_x, y = offset
     month_seperator = 2
     month_width = 42
     font_day = ImageFont.truetype(font_path, font_size_day)
