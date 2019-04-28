@@ -60,6 +60,8 @@ imageBlack = Image.new('1', (EPD_WIDTH, EPD_HEIGHT), 'white')
 drawBlack = ImageDraw.Draw(imageBlack)
 imageRed = Image.new('1', (EPD_WIDTH, EPD_HEIGHT), 'white')
 drawRed = ImageDraw.Draw(imageRed)
+imageColor = Image.new('P', (EPD_WIDTH, EPD_HEIGHT), 'white')
+drawColor = ImageDraw.Draw(imageColor)
 
 """Define helper functions"""
 
@@ -71,6 +73,7 @@ def draw_center_text(position, text, font = font, color = 'black'):
     center_pos = (x - text_width / 2, y - text_height / 2)
     drawBlack.text(center_pos, text, font = font, fill = fill_black, align = "center")
     drawRed.text(center_pos, text, font = font, fill = fill_red, align = "center")
+    drawColor.text(center_pos, text, font = font, fill = color, align = "center")
 
 def draw_left_text(position, text, font = font, color = 'black'):
     x, y = position
@@ -81,6 +84,40 @@ def draw_left_text(position, text, font = font, color = 'black'):
                    text, font = font, fill = fill_black)
     drawRed.text((x, y - text_height / 2),
                  text, font = font, fill = fill_red)
+    drawColor.text((x, y - text_height / 2),
+                   text, font = font, fill = color)
+
+def draw_rect_outline(rect, color):
+    if color == 'black':
+        drawBlack.rectangle(rect, outline = 'black')
+    elif color == 'red':
+        drawRed.rectangle(rect, outline = 'black')
+    else:
+        drawBlack.rectangle(rect, outline = 'white')
+        drawRed.rectangle(rect, outline = 'white')
+    drawColor.rectangle(rect, outline = color)
+
+def draw_rect_fill(rect, color):
+    if color == 'black':
+        drawBlack.rectangle(rect, fill = 'black')
+    elif color == 'red':
+        drawRed.rectangle(rect, fill = 'black')
+    else:
+        drawBlack.rectangle(rect, fill = 'white')
+        drawRed.rectangle(rect, fill = 'white')
+    drawColor.rectangle(rect, fill = color)
+
+def paste_image(image_path, pos, color):
+    image = Image.open(image_path)
+    inverted_image = ImageOps.invert(image.convert('L')).convert('1')
+    if color == 'black':
+        drawBlack.bitmap(pos, inverted_image)
+    elif color == 'red':
+        drawRed.bitmap(pos, inverted_image)
+    else:
+        drawBlack.bitmap(pos, image)
+        drawRed.bitmap(pos, image)
+    drawColor.bitmap(pos, inverted_image, fill = color)
 
 
 def draw_date(center_pos, font_size_day = 20, font_size_date = 20, font_size_year = 20, time = datetime.now(), sep_year = 0, color = 'black', color_year = 'red'):
@@ -188,10 +225,10 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
 
         draw_center_text(pos_windspeed, "{} m/s".format(windspeed), font=font_windspeed)
         if rose_weather:
-            imageBlack.paste(Image.open(path.join('gfx', 'glass_black.bmp')), pos_rose)
+            paste_image(path.join('gfx', 'glass_black.bmp'), pos_rose, color = 'black')
         draw_center_text(pos_weather_icon, weather_icon_font_map[weathericon], font=font_weather_icon)
         if rose_weather:
-            imageRed.paste(Image.open(path.join('gfx', 'glass_red.bmp')), pos_rose)
+            paste_image(path.join('gfx', 'glass_red.bmp'), pos_rose, color = 'red')
         draw_center_text(pos_temperature, "{}°C".format(temperature), font=font_temperature)
         #draw_center_text(pos_humidity,  "{} %".format(humidity), font=font_humidity)
         draw_center_text(pos_description, weather_description, font=font_description, color='red')
@@ -262,10 +299,10 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
             # draw_center_text((70 / 2, y + font_size_day / 2), currentDate.strftime('%d/%m'), font=font_day, color='white')
             # y += font_size_day + seperator
 
-            drawBlack.rectangle(((month_x, y), (month_x + month_width, y + font_size_day + 2 + month_seperator + font_size_month + month_seperator)))
+            draw_rect_outline(((month_x, y), (month_x + month_width, y + font_size_day + 2 + month_seperator + font_size_month + month_seperator)), color='black')
             draw_center_text((month_x + month_width / 2, y + font_size_day / 2), currentDate.strftime('%d'), font=font_day, color='black')
-            drawBlack.rectangle(((month_x + 1, y + font_size_day + 2), (month_x + month_width - 1, y + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), fill = 'black')
-            drawRed.rectangle(((month_x + 1, y + font_size_day + 2), (month_x + month_width - 1, y + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), fill = 'black')
+            draw_rect_fill(((month_x + 1, y + font_size_day + 2), (month_x + month_width - 1, y + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), color = 'black')
+            draw_rect_fill(((month_x + 1, y + font_size_day + 2), (month_x + month_width - 1, y + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), color = 'red')
             draw_center_text((month_x + month_width / 2, y + font_size_day + 2 + month_seperator + font_size_month / 2), currentDate.strftime('%b'), font=font_month, color='white')
             y += font_size_day + 2 + month_seperator + font_size_month + month_seperator + 3
 
@@ -275,9 +312,10 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
         draw_left_text((month_x + month_width + 7, y + font_size / 2), event['summary'], font=font, color=color)
         y += font_size + seperator
 
-def generate(black_image_path, red_image_path):
+def generate(black_image_path, red_image_path, color_image_path = None):
     # Draw date in a red square in left side.
     drawRed.rectangle(((0, 0), (EPD_WIDTH / 2, 130)), fill='black')
+    drawColor.rectangle(((0, 0), (EPD_WIDTH / 2, 130)), fill='red')
     draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color = 'white', color_year = 'white')
 
     # Draw calendar below the date.
@@ -288,19 +326,20 @@ def generate(black_image_path, red_image_path):
 
     # Draw borders between sections.
     seperator_pos = 250
-    drawBlack.rectangle(((EPD_WIDTH / 2, 130), (EPD_WIDTH / 2, seperator_pos)), fill='black')
-    drawBlack.rectangle(((0, seperator_pos), (EPD_WIDTH, seperator_pos)), fill='black')
+    draw_rect_fill(((EPD_WIDTH / 2, 130), (EPD_WIDTH / 2, seperator_pos)), color = 'black')
+    draw_rect_fill(((0, seperator_pos), (EPD_WIDTH, seperator_pos)), color = 'black')
 
     # Draw the list of all calendar events
     draw_calendar_events((2, seperator_pos + 4), events = get_calendar_events(), font_size = 16, seperator = 5)
 
     # Output the images.
-    #image.rotate(90, expand=True)
     imageBlack.save(black_image_path)
     imageRed.save(red_image_path)
+    if (color_image_path):
+        imageColor.save(color_image_path)
 
 def main():
-    generate('output_black.bmp', 'output_red.bmp')
+    generate('output_black.bmp', 'output_red.bmp', 'output.bmp')
     
 if __name__ == '__main__':
     main()
