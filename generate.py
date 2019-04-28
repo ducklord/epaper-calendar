@@ -274,6 +274,7 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
     month_x, month_y = offset
     month_seperator = 2
     month_width = 42
+    day_seperator = 0
     y_event = month_y
     y_day_start = month_y
     y_day_size = font_size_day + 2 + month_seperator + font_size_month + month_seperator + 3
@@ -302,7 +303,8 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
             # draw_center_text((70 / 2, y + font_size_day / 2), currentDate.strftime('%d/%m'), font=font_day, color='white')
             # y += font_size_day + seperator
 
-            y_event = max(y_day_start, y_event)
+            y_event = max(y_day_start, y_event) + day_seperator
+            day_seperator = 10
 
             draw_rect_outline(((month_x, y_event), (month_x + month_width, y_event + font_size_day + 2 + month_seperator + font_size_month + month_seperator)), color='black')
             draw_center_text((month_x + month_width / 2, y_event + font_size_day / 2), currentDate.strftime('%d'), font=font_day, color='black')
@@ -310,7 +312,7 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
             draw_rect_fill(((month_x + 1, y_event + font_size_day + 2), (month_x + month_width - 1, y_event + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), color = 'red')
             draw_center_text((month_x + month_width / 2, y_event + font_size_day + 2 + month_seperator + font_size_month / 2), currentDate.strftime('%b'), font=font_month, color='white')
 
-            y_day_start += y_day_size + 5
+            y_day_start += y_day_size
 
         # Draw the event it self.
         draw_left_text((month_x + month_width + 4, y_event + font_size_time / 2), "{} - {}".format(eventStartDateTime.strftime('%H:%M'), eventEndDateTime.strftime('%H:%M')), font=font_time, color=color)
@@ -335,7 +337,7 @@ def generate(black_image_path, red_image_path, color_image_path = None):
     draw_rect_fill(((0, seperator_pos), (EPD_WIDTH, seperator_pos)), color = 'black')
 
     # Draw the list of all calendar events
-    draw_calendar_events((2, seperator_pos + 4), events = get_calendar_events(), font_size = 19, font_size_time = 12, seperator = 5)
+    draw_calendar_events((2, seperator_pos + 3), events = get_calendar_events(), font_size = 19, font_size_time = 12, seperator = 5)
 
     # Output the images.
     imageBlack.save(black_image_path)
