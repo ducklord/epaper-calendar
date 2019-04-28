@@ -68,7 +68,7 @@ drawColor = ImageDraw.Draw(imageColor)
 def draw_center_text(position, text, font = font, color = 'black'):
     x, y = position
     text_width, text_height = drawBlack.textsize(text, font = font)
-    fill_black = 'white' if color == 'white' else 'black'
+    fill_black = 'black' if color == 'black' else 'white'
     fill_red = 'black' if color == 'red' else 'white'
     center_pos = (x - text_width / 2, y - text_height / 2)
     drawBlack.text(center_pos, text, font = font, fill = fill_black, align = "center")
@@ -78,7 +78,7 @@ def draw_center_text(position, text, font = font, color = 'black'):
 def draw_left_text(position, text, font = font, color = 'black'):
     x, y = position
     text_width, text_height = drawBlack.textsize(text, font = font)
-    fill_black = 'white' if color == 'white' else 'black'
+    fill_black = 'black' if color == 'black' else 'white'
     fill_red = 'black' if color == 'red' else 'white'
     drawBlack.text((x, y - text_height / 2),
                    text, font = font, fill = fill_black)
@@ -115,6 +115,7 @@ def paste_image(image_path, pos, color):
     elif color == 'red':
         drawRed.bitmap(pos, inverted_image)
     else:
+        # Not sure what this is surpose to do.
         drawBlack.bitmap(pos, image)
         drawRed.bitmap(pos, image)
     drawColor.bitmap(pos, inverted_image, fill = color)
@@ -308,7 +309,6 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
 
             draw_rect_outline(((month_x, y_event), (month_x + month_width, y_event + font_size_day + 2 + month_seperator + font_size_month + month_seperator)), color='black')
             draw_center_text((month_x + month_width / 2, y_event + font_size_day / 2), currentDate.strftime('%d'), font=font_day, color='black')
-            draw_rect_fill(((month_x + 1, y_event + font_size_day + 2), (month_x + month_width - 1, y_event + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), color = 'black')
             draw_rect_fill(((month_x + 1, y_event + font_size_day + 2), (month_x + month_width - 1, y_event + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), color = 'red')
             draw_center_text((month_x + month_width / 2, y_event + font_size_day + 2 + month_seperator + font_size_month / 2), currentDate.strftime('%b'), font=font_month, color='white')
 
