@@ -314,8 +314,7 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
 
 def generate(black_image_path, red_image_path, color_image_path = None):
     # Draw date in a red square in left side.
-    drawRed.rectangle(((0, 0), (EPD_WIDTH / 2, 130)), fill='black')
-    drawColor.rectangle(((0, 0), (EPD_WIDTH / 2, 130)), fill='red')
+    draw_rect_fill(((0, 0), (EPD_WIDTH / 2, 130)), color = 'red')
     draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color = 'white', color_year = 'white')
 
     # Draw calendar below the date.
