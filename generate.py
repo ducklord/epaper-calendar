@@ -134,7 +134,7 @@ def draw_date(center_pos, font_size_day = 20, font_size_date = 20, font_size_yea
     draw_center_text(pos_day, time.strftime("%A"), font = font_day, color = color)
 
 """Draw the caleandar"""
-def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day = 20, seperation = 20, color = 'black', color_current = 'red', time = datetime.now()):
+def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day = 20, seperation = 20, color = 'black', color_weekend = 'red', time = datetime.now()):
     x, y = offset
     font_day_of_week = ImageFont.truetype(font_path, font_size_day_of_week)
     font_month_day = ImageFont.truetype(font_path, font_size_month_day)
@@ -152,19 +152,32 @@ def draw_calendar(offset, width, font_size_day_of_week = 20, font_size_month_day
 
     for index, day in enumerate(days_in_week):
         pos = (calendar_col(index), row_day_of_week)
-        day_color = color_current if index == day_of_week else color
-        draw_center_text(pos, day, font=font_day_of_week, color=day_color)
+        day_color = color_weekend if index == 5 or index == 6 else color
+        if index == day_of_week:
+            half_height = font_size_day_of_week / 2 + 2
+            half_width = 12
+            draw_rect_fill(((pos[0] - half_width, pos[1] - half_height), (pos[0] + half_width, pos[1] + half_height)), color = day_color)
+            draw_center_text(pos, day, font = font_day_of_week, color = 'white')
+        else:
+            draw_center_text(pos, day, font = font_day_of_week, color = day_color)
 
     monthCalendar = calendar.monthcalendar(time.year, time.month)
     calendar.setfirstweekday(calendar.MONDAY)
 
     for rowIndex in range(len(monthCalendar)):
         for monthDay in monthCalendar[rowIndex]:
-            pos = (calendar_col(monthCalendar[rowIndex].index(monthDay)),
+            colIndex = monthCalendar[rowIndex].index(monthDay)
+            pos = (calendar_col(colIndex),
                    calendar_row(rowIndex))
-            day_color = color_current if monthDay == day_of_month else color
+            day_color = color_weekend if colIndex == 5 or colIndex == 6 else color
             text = str(monthDay) if not monthDay == 0 else ''
-            draw_center_text(pos, text, font=font_month_day, color=day_color)
+            if monthDay == day_of_month:
+                half_height = font_size_month_day / 2
+                half_width = 10
+                draw_rect_fill(((pos[0] - half_width - 1, pos[1] - half_height + 1), (pos[0] + half_width, pos[1] + half_height)), color = day_color)
+                draw_center_text(pos, text, font = font_month_day, color = 'white')
+            else:
+                draw_center_text(pos, text, font = font_month_day, color = day_color)
 
 
 """Draw the weather section of the image."""
@@ -327,7 +340,7 @@ def generate(black_image_path, red_image_path, color_image_path = None):
     draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color = 'white', color_year = 'white')
 
     # Draw calendar below the date.
-    draw_calendar((0, 145), EPD_WIDTH / 2, font_size_day_of_week = 9, font_size_month_day = 14, seperation = 5, color = 'black', color_current = 'red')
+    draw_calendar((0, 145), EPD_WIDTH / 2, font_size_day_of_week = 9, font_size_month_day = 14, seperation = 5)
 
     # Draw weather status in right side.
     draw_weather((EPD_WIDTH / 2, 20), EPD_WIDTH / 2, font_size_windspeed = 18, font_size_weather_icon = 120, font_size_temperature = 50, font_size_description = 10, sep_weather_icon = 0)
