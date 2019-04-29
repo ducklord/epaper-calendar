@@ -305,6 +305,7 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
             # y += font_size_day + seperator
 
             y_event = max(y_day_start, y_event) + day_seperator
+            y_day_start = y_event
             day_seperator = 5
 
             draw_rect_outline(((month_x, y_event), (month_x + month_width, y_event + font_size_day + 2 + month_seperator + font_size_month + month_seperator)), color='black')
