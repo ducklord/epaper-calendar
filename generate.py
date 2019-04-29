@@ -260,14 +260,14 @@ def get_calendar_events():
     service = build('calendar', 'v3', credentials = google_credentials)
 
     # Call the Calendar API
-    now = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0).isoformat() + 'Z'
-    sevenDaysFromNow = (datetime.utcnow() + timedelta(days=7)).isoformat() + 'Z'
-    events_result = service.events().list(calendarId='primary',
-                                          timeMin=now,
-                                          timeMax=sevenDaysFromNow,
-                                          maxResults=10,
-                                          singleEvents=True,
-                                          orderBy='startTime').execute()
+    now = datetime.utcnow().replace(hour = 0, minute = 0, second = 0, microsecond = 0).isoformat() + 'Z'
+    sevenDaysFromNow = (datetime.utcnow() + timedelta(days = 14)).isoformat() + 'Z'
+    events_result = service.events().list(calendarId = 'primary',
+                                          timeMin = now,
+                                          timeMax = sevenDaysFromNow,
+                                          maxResults = 15,
+                                          singleEvents = True,
+                                          orderBy = 'startTime').execute()
     return events_result.get('items', [])
 
 
