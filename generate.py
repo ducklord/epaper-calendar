@@ -5,6 +5,7 @@ from __future__ import print_function
 import pyowm
 import calendar
 import pickle
+import locale
 from os import path
 from datetime import datetime, date, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -54,6 +55,7 @@ weather_icon_font_map = {
     '50n':'W'
 }
 
+locale.setlocale(locale.LC_ALL, 'da_DK.utf8')
 
 """Create a blank white page first"""
 imageBlack = Image.new('1', (EPD_WIDTH, EPD_HEIGHT), 'white')
