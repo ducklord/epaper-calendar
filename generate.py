@@ -205,7 +205,7 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
                 int(weather.get_sunrise_time(timeformat='unix'))).strftime('%-H:%M'))
             sunsettime = str(datetime.fromtimestamp(
                 int(weather.get_sunset_time(timeformat='unix'))).strftime('%-H:%M'))
-            rose_weather = windspeed < 5 and temperature > 20
+            rose_weather = windspeed < 5.5 and temperature >= 19.5
         else:
             weathericon = '01d'
             humidity = 54
