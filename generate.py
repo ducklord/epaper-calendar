@@ -288,7 +288,7 @@ def get_calendar_events():
     return events_result.get('items', [])
 
 
-def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 13, font_size_day = 25, font_size_month = 10, seperator = 0):
+def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 13, font_size_day = 25, font_size_multi_day = 14, font_size_month = 10, seperator = 0):
     month_x, month_y = offset
     month_seperator = 2
     month_width = 42
@@ -297,6 +297,7 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
     y_day_start = month_y
     y_day_size = font_size_day + 2 + month_seperator + font_size_month + month_seperator + 3
     font_day = ImageFont.truetype(font_path, font_size_day)
+    font_multi_day = ImageFont.truetype(font_path, font_size_multi_day)
     font_month = ImageFont.truetype(font_path, font_size_month)
     font_time = ImageFont.truetype(font_path, font_size_time)
     font = ImageFont.truetype(font_path, font_size)
@@ -306,6 +307,7 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
         eventStartDateTime = datetime.fromisoformat(event['start'].get('dateTime', event['start'].get('date')))
         eventEndDateTime = datetime.fromisoformat(event['end'].get('dateTime', event['end'].get('date')))
         eventStartDate = eventStartDateTime.date()
+        singleDay = eventStartDate == eventEndDateTime.date()
         color = 'red' if eventStartDate <= datetime.now().date() else 'black'
         if not currentDate == eventStartDate:
             # Draw event date.
@@ -326,14 +328,19 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
             day_seperator = 5
 
             draw_rect_outline(((month_x, y_event), (month_x + month_width, y_event + font_size_day + 2 + month_seperator + font_size_month + month_seperator)), color='black')
-            draw_center_text((month_x + month_width / 2, y_event + font_size_day / 2), currentDate.strftime('%d'), font=font_day, color='black')
+            if singleDay:
+                draw_center_text((month_x + month_width / 2, y_event + font_size_day / 2), currentDate.strftime('%d'), font=font_day, color='black')
+            else:
+                draw_center_text((month_x + month_width / 2, y_event + font_size_multi_day / 2), currentDate.strftime('%d'), font=font_multi_day, color='black')
+                draw_center_text((month_x + month_width / 2, y_event + font_size_multi_day / 2 + font_size_multi_day - 2), eventEndDateTime.strftime('%d'), font=font_multi_day, color='black')
+
             draw_rect_fill(((month_x + 1, y_event + font_size_day + 2), (month_x + month_width - 1, y_event + font_size_day + month_seperator + font_size_month + month_seperator + 2 - 1)), color = 'red')
             draw_center_text((month_x + month_width / 2, y_event + font_size_day + 2 + month_seperator + font_size_month / 2), currentDate.strftime('%b'), font=font_month, color='white')
 
             y_day_start += y_day_size
 
         # Draw the event it self.
-        if eventStartDate == eventEndDateTime.date():
+        if singleDay:
             draw_left_text((month_x + month_width + 4, y_event + font_size_time / 2), "{} - {}".format(eventStartDateTime.strftime('%H:%M'), eventEndDateTime.strftime('%H:%M')), font=font_time, color=color)
         else:
             draw_left_text((month_x + month_width + 4, y_event + font_size_time / 2), "{} - {}".format(eventStartDateTime.strftime('%-d/%-m'), eventEndDateTime.strftime('%-d/%-m')), font=font_time, color=color)
