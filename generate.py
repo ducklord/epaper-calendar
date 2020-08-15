@@ -307,7 +307,7 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
         eventStartDateTime = datetime.fromisoformat(event['start'].get('dateTime', event['start'].get('date')))
         eventEndDateTime = datetime.fromisoformat(event['end'].get('dateTime', event['end'].get('date')))
         eventStartDate = eventStartDateTime.date()
-        singleDay = eventStartDate == eventEndDateTime.date()
+        singleDay = eventEndDateTime.date() - eventStartDate <= timedelta(days = 1)
         color = 'red' if eventStartDate <= datetime.now().date() else 'black'
         if not currentDate == eventStartDate:
             # Draw event date.
