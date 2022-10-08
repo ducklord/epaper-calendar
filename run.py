@@ -6,7 +6,7 @@ from generate import generate
 from display import display
 
 def main():
-    black_file_path, red_file_path = 'output_black.bmp', 'output_red.bmp'
+    black_file_path, red_file_path = '/tmp/output_black.bmp', '/tmp/output_red.bmp'
     generate(black_file_path, red_file_path)
     display(black_file_path, red_file_path)
     
