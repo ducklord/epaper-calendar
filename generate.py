@@ -260,19 +260,25 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
 
 def get_calendar_events():
     google_credentials = None
-    if path.exists('token.pickle'):
+    if path.exists('/tmp/token.pickle'):
+        with open('/tmp/token.pickle', 'rb') as token:
+            google_credentials = pickle.load(token)
+    elif path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             google_credentials = pickle.load(token)
             
     if not google_credentials or not google_credentials.valid:
         if google_credentials and google_credentials.expired and google_credentials.refresh_token:
             google_credentials.refresh(Request())
+            # Save the credentials for the next run
+            with open('/tmp/token.pickle', 'wb') as token:
+                pickle.dump(google_credentials, token)
         else:
             flow = InstalledAppFlow.from_client_secrets_file('credentials.json', CREDENTIALS_SCOPES)
             google_credentials = flow.run_local_server()
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(google_credentials, token)
+            # Save the credentials for the next run
+            with open('token.pickle', 'wb') as token:
+                pickle.dump(google_credentials, token)
 
     service = build('calendar', 'v3', credentials = google_credentials)
 
