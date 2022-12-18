@@ -125,16 +125,20 @@ def paste_image(image_path, pos, color):
     drawColor.bitmap(pos, inverted_image, fill = color)
 
 
-def draw_date(center_pos, font_size_day = 20, font_size_date = 20, font_size_year = 20, time = datetime.now(), sep_year = 0, color = 'black', color_year = 'red'):
+def draw_date(center_pos, font_size_day = 20, font_size_date = 20, font_size_month = 20, font_size_year = 20, time = datetime.now(), sep_year = 0, color = 'black', color_year = 'red'):
     x, y = center_pos
     font_day = ImageFont.truetype(font_path, font_size_day)
     font_date = ImageFont.truetype(font_path, font_size_date)
+    font_month = ImageFont.truetype(font_path, font_size_month)
     font_year = ImageFont.truetype(font_path, font_size_year)
-    pos_year = (x, y - font_size_year / 2 - font_size_date / 2 - sep_year)
-    pos_date = center_pos
-    pos_day = (x, y + font_size_day / 2 + font_size_date / 2)
+    pos_year = (x, y - font_size_year / 2 - font_size_date - sep_year)
+    pos_date = (x, y - font_size_date / 2)
+    pos_month = (x, y + font_size_month / 2)
+    pos_day = (x, y + font_size_day / 2 + font_size_month + sep_year)
+
     draw_center_text(pos_year, time.strftime("%Y"), font = font_year, color = color_year)
-    draw_center_text(pos_date, time.strftime("%-d %B"), font = font_date, color = color)
+    draw_center_text(pos_date, time.strftime("%-d"), font = font_date, color = color)
+    draw_center_text(pos_month, time.strftime("%B"), font = font_month, color = color)
     draw_center_text(pos_day, time.strftime("%A"), font = font_day, color = color)
 
 """Draw the caleandar"""
@@ -359,7 +363,7 @@ def draw_calendar_events(offset, events = [], font_size = 20, font_size_time = 1
 def generate(black_image_path, red_image_path, color_image_path = None):
     # Draw date in a red square in left side.
     draw_rect_fill(((0, 0), (EPD_WIDTH / 2, 130)), color = 'red')
-    draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_year = 13, sep_year=5, color = 'white', color_year = 'white')
+    draw_date((EPD_WIDTH / 4, 65), font_size_day = 20, font_size_date = 30, font_size_month = 25, font_size_year = 13, sep_year=5, color = 'white', color_year = 'white')
 
     # Draw calendar below the date.
     draw_calendar((0, 145), EPD_WIDTH / 2, font_size_day_of_week = 9, font_size_month_day = 14, seperation = 5)
