@@ -1,0 +1,9 @@
+[Unit]
+Description=Update ecalender display
+
+[Timer]
+OnCalendar=*-*-* 00,06,07,08,10,12,14,16,17,18,19,20,21,22,23:00:00
+Unit=epaper.service
+
+[Install]
+WantedBy=timers.target

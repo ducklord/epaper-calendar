@@ -1,0 +1,12 @@
+[Unit]
+Description=EPaper control service
+After=multi-user.target
+
+[Service]
+WorkingDirectory=/home/pi/epaper-calendar/
+ExecStart=/bin/bash -c 'cd /home/pi/epaper-calendar/ && ./run.py'
+
+[Install]
+WantedBy=multi-user.target
+
+
