@@ -23,7 +23,7 @@ Copyright bullshit stuff.
 """Settings:"""
 api_key = ""
 location = "Aalborg, DK"
-testing = True
+draw_weather_testing = True
 
 """Defines:"""
 EPD_WIDTH = 384
@@ -197,73 +197,67 @@ def draw_weather(offset, width, font_size_windspeed = 20, font_size_weather_icon
     x, y = offset
     owm = pyowm.OWM(api_key)
     """Connect to Openweathermap API to fetch weather data"""
-    if testing:
-        if not testing:
-            print("Connecting to Openweathermap API servers...")
-            observation = owm.weather_at_place(location)
-            print("weather data:")
-            weather = observation.get_weather()
-            weathericon = weather.get_weather_icon_name()
-            humidity = weather.get_humidity()
-            cloudstatus = weather.get_clouds()
-            weather_description = weather.get_status()
-            temperature = int(weather.get_temperature(unit='celsius')['temp'])
-            windspeed = int(weather.get_wind()['speed'])
-            sunrisetime = str(datetime.fromtimestamp(
-                int(weather.get_sunrise_time(timeformat='unix'))).strftime('%-H:%M'))
-            sunsettime = str(datetime.fromtimestamp(
-                int(weather.get_sunset_time(timeformat='unix'))).strftime('%-H:%M'))
-            rose_weather = windspeed < 5.5 and temperature >= 19.5
-        else:
-            weathericon = '01d'
-            humidity = 54
-            cloudstatus = 8
-            weather_description = 'Clear'
-            temperature = 22
-            windspeed = 3
-            sunrisetime = '6:15'
-            sunsettime = '20:25'
-            rose_weather = True
-
-        """Debug print"""
-        print('weathericon = \'' + weathericon + '\'')
-        print('humidity = ' + str(humidity))
-        print('cloudstatus = ' + str(cloudstatus))
-        print('weather_description = \'' + weather_description + '\'')
-        print('temperature = ' + str(temperature))
-        print('windspeed = ' + str(windspeed))
-        print('sunrisetime = \'' + sunrisetime + '\'')
-        print('sunsettime = \'' + sunsettime + '\'')
-        print('rose_weather = ' + str(rose_weather))
-
-        font_windspeed = ImageFont.truetype(font_path, font_size_windspeed)
-        font_weather_icon = ImageFont.truetype(font_weather_icon_path, font_size_weather_icon)
-        font_temperature = ImageFont.truetype(font_path, font_size_temperature)
-        font_humidity = ImageFont.truetype(font_path, font_size_humidity)
-        font_description = ImageFont.truetype(font_path, font_size_description)
-        
-        pos_windspeed = (width / 2 + x, font_size_windspeed / 2 + y)
-        pos_weather_icon = (width / 2 + x, pos_windspeed[1] + font_size_windspeed / 2 + font_size_weather_icon / 2 + sep_weather_icon)
-        pos_rose = (int(width / 2 + x - 66), int(pos_weather_icon[1] + 20))
-        pos_temperature = (width / 2 + x,  pos_weather_icon[1] + font_size_weather_icon / 2 + font_size_temperature / 2)
-        pos_humidity = (width / 2 + x, 150 + y)
-        pos_description = (width / 2 + x, pos_temperature[1] + font_size_temperature / 2 + font_size_description)
-
-        draw_center_text(pos_windspeed, "{} m/s".format(windspeed), font=font_windspeed)
-        if rose_weather:
-            paste_image(path.join('gfx', 'glass_black.bmp'), pos_rose, color = 'black')
-        draw_center_text(pos_weather_icon, weather_icon_font_map[weathericon], font=font_weather_icon)
-        if rose_weather:
-            paste_image(path.join('gfx', 'glass_red.bmp'), pos_rose, color = 'red')
-        draw_center_text(pos_temperature, "{}°C".format(temperature), font=font_temperature)
-        #draw_center_text(pos_humidity,  "{} %".format(humidity), font=font_humidity)
-        draw_center_text(pos_description, weather_description, font=font_description, color='red')
-
+    if not draw_weather_testing:
+        print("Connecting to Openweathermap API servers...")
+        mgr = owm.weather_manager()
+        observation = mgr.weather_at_place(location)
+        print("weather data:")
+        weather = observation.weather
+        weathericon = weather.weather_icon_name
+        humidity = weather.humidity
+        cloudstatus = weather.clouds
+        weather_description = weather.detailed_status
+        temperature = round(weather.temperature('celsius')['temp'])
+        windspeed = round(weather.wind()['speed'])
+        sunrisetime = str(datetime.fromtimestamp(
+            int(weather.sunrise_time(timeformat='unix'))).strftime('%-H:%M'))
+        sunsettime = str(datetime.fromtimestamp(
+            int(weather.sunset_time(timeformat='unix'))).strftime('%-H:%M'))
+        rose_weather = windspeed < 5.5 and temperature >= 19.5
     else:
-        """If no response was received from the openweathermap
-        api server, add the cloud with question mark"""
-        font_error = ImageFont.truetype(font_path, 18)
-        draw_center_text((x + width / 2, y + 200 / 2), "Openweathermap\nnot\nresponding", font = font_error, color = 'red')
+        weathericon = '01d'
+        humidity = 54
+        cloudstatus = 8
+        weather_description = 'Clear'
+        temperature = 22
+        windspeed = 3
+        sunrisetime = '6:15'
+        sunsettime = '20:25'
+        rose_weather = True
+
+    """Debug print"""
+    print('weathericon = \'' + weathericon + '\'')
+    print('humidity = ' + str(humidity))
+    print('cloudstatus = ' + str(cloudstatus))
+    print('weather_description = \'' + weather_description + '\'')
+    print('temperature = ' + str(temperature))
+    print('windspeed = ' + str(windspeed))
+    print('sunrisetime = \'' + sunrisetime + '\'')
+    print('sunsettime = \'' + sunsettime + '\'')
+    print('rose_weather = ' + str(rose_weather))
+
+    font_windspeed = ImageFont.truetype(font_path, font_size_windspeed)
+    font_weather_icon = ImageFont.truetype(font_weather_icon_path, font_size_weather_icon)
+    font_temperature = ImageFont.truetype(font_path, font_size_temperature)
+    font_humidity = ImageFont.truetype(font_path, font_size_humidity)
+    font_description = ImageFont.truetype(font_path, font_size_description)
+
+    pos_windspeed = (width / 2 + x, font_size_windspeed / 2 + y)
+    pos_weather_icon = (width / 2 + x, pos_windspeed[1] + font_size_windspeed / 2 + font_size_weather_icon / 2 + sep_weather_icon)
+    pos_rose = (int(width / 2 + x - 66), int(pos_weather_icon[1] + 20))
+    pos_temperature = (width / 2 + x,  pos_weather_icon[1] + font_size_weather_icon / 2 + font_size_temperature / 2)
+    pos_humidity = (width / 2 + x, 150 + y)
+    pos_description = (width / 2 + x, pos_temperature[1] + font_size_temperature / 2 + font_size_description)
+
+    draw_center_text(pos_windspeed, "{} m/s".format(windspeed), font=font_windspeed)
+    if rose_weather:
+        paste_image(path.join('gfx', 'glass_black.bmp'), pos_rose, color = 'black')
+    draw_center_text(pos_weather_icon, weather_icon_font_map[weathericon], font=font_weather_icon)
+    if rose_weather:
+        paste_image(path.join('gfx', 'glass_red.bmp'), pos_rose, color = 'red')
+    draw_center_text(pos_temperature, "{}°C".format(temperature), font=font_temperature)
+    #draw_center_text(pos_humidity,  "{} %".format(humidity), font=font_humidity)
+    draw_center_text(pos_description, weather_description, font=font_description, color='red')
 
 
 def get_calendar_events():
