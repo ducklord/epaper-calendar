@@ -3,8 +3,8 @@ Description=EPaper control service
 After=multi-user.target
 
 [Service]
-WorkingDirectory=/home/pi/epaper-calendar/
-ExecStart=/bin/bash -c 'cd /home/pi/epaper-calendar/ && ./run.py'
+WorkingDirectory=/home/duck/epaper-calendar/
+ExecStart=/home/duck/epaper-calendar/bin/python /home/duck/epaper-calendar/run.py --serve-in-foreground
 
 [Install]
 WantedBy=multi-user.target
