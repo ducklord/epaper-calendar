@@ -69,9 +69,13 @@ drawColor = ImageDraw.Draw(imageColor)
 
 """Define helper functions"""
 
+def text_size(imageDraw, text, font):
+    left, top, right, bottom = imageDraw.textbbox((0, 0), text, font = font)
+    return (right, bottom)
+
 def draw_center_text(position, text, font = font, color = 'black'):
     x, y = position
-    text_width, text_height = drawBlack.textsize(text, font = font)
+    text_width, text_height = text_size(drawBlack, text, font)
     fill_black = 'black' if color == 'black' else 'white'
     fill_red = 'black' if color == 'red' else 'white'
     center_pos = (x - text_width / 2, y - text_height / 2)
@@ -81,7 +85,7 @@ def draw_center_text(position, text, font = font, color = 'black'):
 
 def draw_left_text(position, text, font = font, color = 'black'):
     x, y = position
-    text_width, text_height = drawBlack.textsize(text, font = font)
+    text_width, text_height = text_size(drawBlack, text, font)
     fill_black = 'black' if color == 'black' else 'white'
     fill_red = 'black' if color == 'red' else 'white'
     drawBlack.text((x, y - text_height / 2),
